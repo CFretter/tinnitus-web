@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Noise Generator</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+  }
+  #sliders {
+    margin-top: 20px;
+  }
+</style>
+</head>
+<body>
+  <h1>White Noise Generator</h1>
+  <button id="playButton">Play</button>
+  <div id="sliders">
+    <label for="volumeSlider">Volume:</label>
+    <input type="range" id="volumeSlider" min="0" max="1" step="0.01" value="0.5">
+    <br>
+    <label for="frequencySlider">Frequency:</label>
+    <input type="range" id="frequencySlider" min="20" max="20000" step="1" value="1000">
+    <span id="frequencyLabel">1000 Hz</span>
+    <br>
+    <label for="bandwidthSlider">Bandwidth:</label>
+    <input type="range" id="bandwidthSlider" min="1" max="2000" step="1" value="100">
+    <span id="bandwidthLabel">100 Hz</span>
+  </div>
+
+  <script>
+    // Initialize variables
+    let audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    let whiteNoise;
+    let bandpassFilter;
+    let isPlaying = false;
+
+    // Create white noise buffer
+    function createWhiteNoiseBuffer() {
+      let bufferSize = 2 * audioCtx.sampleRate;
+      let noiseBuffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+      let output = noiseBuffer.getChannelData(0);
+
+      for (let i = 0; i < bufferSize; i++) {
+        output[i] = Math.random() * 2 - 1;
+      }
+
+      return noiseBuffer;
+    }
+
+    // Create bandpass filter
+    function createBandpassFilter() {
+      let filter = audioCtx.createBiquadFilter();
+      filter.type = 'bandpass';
+      filter.frequency.value = parseFloat(document.getElementById('bandwidthSlider').value); // default frequency
+      let bandwidthValue = parseFloat(document.getElementById('bandwidthSlider').value);
+      filter.Q.value = 10//filter.frequency.value / bandwidthValue; // default Q factor
+      filter.gain.value=1
+      return filter;
+    }
+
+    // Update bandpass filter parameters
+    function updateFilterParams() {
+      bandpassFilter.frequency.value = parseFloat(document.getElementById('frequencySlider').value);
+      let bandwidthValue = parseFloat(document.getElementById('bandwidthSlider').value);
+      let nyquist = audioCtx.sampleRate / 2;
+      bandpassFilter.Q.value = bandpassFilter.frequency.value / bandwidthValue;
+      console.log(bandwidthValue,bandpassFilter.Q.value)
+      //console.log(bandpassFilter)
+      // Update labels
+      document.getElementById('frequencyLabel').textContent = bandpassFilter.frequency.value + ' Hz';
+      document.getElementById('bandwidthLabel').textContent = bandwidthValue + ' Hz';
+    }
+
+    // Create audio graph
+    function createAudioGraph() {
+      whiteNoise = audioCtx.createBufferSource();
+      whiteNoise.loop=true
+      whiteNoise.buffer = createWhiteNoiseBuffer();
+
+      bandpassFilter = createBandpassFilter();
+
+      whiteNoise.connect(bandpassFilter).connect(audioCtx.destination);
+    }
+createAudioGraph()
+    // Event listeners
+    document.getElementById('playButton').addEventListener('click', function() {
+      if (!isPlaying) {
+        createAudioGraph();
+        whiteNoise.start();
+        isPlaying = true;
+        document.getElementById('playButton').textContent = 'Stop';
+      } else {
+        whiteNoise.stop();
+        isPlaying = false;
+        document.getElementById('playButton').textContent = 'Play';
+      }
+    });
+
+    document.getElementById('volumeSlider').addEventListener('input', function() {
+      whiteNoise.volume = parseFloat(this.value);
+    });
+
+    document.getElementById('frequencySlider').addEventListener('input', function() {
+      updateFilterParams();
+    });
+
+    document.getElementById('bandwidthSlider').addEventListener('input', function() {
+      updateFilterParams();
+    });
+  </script>
+</body>
+</html>
