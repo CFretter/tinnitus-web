@@ -66,6 +66,7 @@
     let whiteNoise;
     let gainNode;
     let pannerNode;
+    let volume;
     let bandpassFilter;
     let isPlaying = false;
     let side =false;
@@ -100,8 +101,11 @@
       bandpassFilter.frequency.value = parseFloat(document.getElementById('frequencySlider').value);
       let bandwidthValue = parseFloat(document.getElementById('bandwidthSlider').value);
       let nyquist = audioCtx.sampleRate / 2;
-      bandpassFilter.Q.value = bandpassFilter.frequency.value / bandwidthValue;
-      console.log(bandwidthValue,bandpassFilter.Q.value)
+      let q=bandpassFilter.frequency.value *1.0 / bandwidthValue;
+      bandpassFilter.Q.value = q;
+      // console.log(bandwidthValue,q,volume)
+     gainNode.gain.value = volume*q;
+      
       // Update labels
       document.getElementById('frequencyLabel').textContent = bandpassFilter.frequency.value + ' Hz';
       document.getElementById('bandwidthLabel').textContent = bandwidthValue + ' Hz';
@@ -149,7 +153,8 @@ createAudioGraph()
        
     });
     document.getElementById('volumeSlider').addEventListener('input', function() {
-      gainNode.gain.value = parseFloat(this.value);
+      volume=parseFloat(this.value);
+      updateFilterParams();
     });
 
     document.getElementById('frequencySlider').addEventListener('input', function() {
