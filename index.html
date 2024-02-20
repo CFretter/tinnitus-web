@@ -44,16 +44,18 @@
    
      </div>
     <br>
-     <label for="volumeSlider">Volume:</label>
-    <input type="range" id="volumeSlider" min="0" max="1" step="0.01" value="0.5">
+    <div style="width: 500px;">
+      <label for="volumeSlider">Volume:</label>
+    <input type="range" id="volumeSlider" min="0" max="1" step="0.01" value="0.5" style="width:90%">
     <span id="volumeLabel"></span>
+    </div>
     <br>
     <label for="frequencySlider">Frequency:</label>
-    <input type="range" id="frequencySlider" min="20" max="20000" step="1" value="1000">
+    <input type="range" id="frequencySlider" min="100" max="18000" step="1" value="1000" style="width:90%">
     <span id="frequencyLabel">1000 Hz</span>
     <br>
     <label for="bandwidthSlider">Bandwidth:</label>
-    <input type="range" id="bandwidthSlider" min="1" max="500" step="1" value="100">
+    <input type="range" id="bandwidthSlider" min="1" max="500" step="1" value="100" style="width:90%">
     <span id="bandwidthLabel">100 Hz</span>
   </div>
 
@@ -99,11 +101,9 @@
       let nyquist = audioCtx.sampleRate / 2;
       bandpassFilter.Q.value = bandpassFilter.frequency.value / bandwidthValue;
       console.log(bandwidthValue,bandpassFilter.Q.value)
-      //console.log(bandpassFilter)
       // Update labels
       document.getElementById('frequencyLabel').textContent = bandpassFilter.frequency.value + ' Hz';
       document.getElementById('bandwidthLabel').textContent = bandwidthValue + ' Hz';
-    console.log(side)
     }
 
     // Create audio graph
@@ -113,11 +113,10 @@
       whiteNoise.buffer = createWhiteNoiseBuffer();
 
       bandpassFilter = createBandpassFilter();
+
       pannerNode = audioCtx.createPanner();
-  //Setting the position of the sound
       pannerNode.setPosition(-1, 0, 0);//If you want it to play on the left channel
-     // pannerNode.setPosition(1, 0, 0);//If you want it to play on the right channel
-       gainNode = audioCtx.createGain();
+      gainNode = audioCtx.createGain();
       whiteNoise.connect(bandpassFilter).connect(pannerNode).connect(gainNode).connect(audioCtx.destination);
     }
 createAudioGraph()
@@ -138,13 +137,13 @@ createAudioGraph()
     document.getElementById('left').addEventListener('input', function() {
      
       side=true;
-           pannerNode.setPosition(-1, 0, 0);//If you want it to play on the left channel
+      pannerNode.setPosition(-1, 0, 0);//If you want it to play on the left channel
    
     });
      document.getElementById('right').addEventListener('input', function() {
     
       side=false;
-            pannerNode.setPosition(1, 0, 0);//If you want it to play on the left channel
+      pannerNode.setPosition(1, 0, 0);//If you want it to play on the left channel
    
        
     });
