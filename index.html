@@ -81,8 +81,13 @@
       whiteNoise.buffer = createWhiteNoiseBuffer();
 
       bandpassFilter = createBandpassFilter();
+      var pannerNode = audioCtx.createPanner();
 
-      whiteNoise.connect(bandpassFilter).connect(audioCtx.destination);
+
+      //Setting the position of the sound
+      pannerNode.setPosition(-1, 0, 0);//If you want it to play on the left channel
+     // pannerNode.setPosition(1, 0, 0);//If you want it to play on the right channel
+      whiteNoise.connect(bandpassFilter).connect(pannerNode).connect(audioCtx.destination);
     }
 createAudioGraph()
     // Event listeners
