@@ -45,11 +45,9 @@
    
      </div>
     <br>
-    <div style="width: 400px;">
       <label for="volumeSlider">Volume:</label>
     <input type="range" id="volumeSlider" min="0" max="1" step="0.01" value="0.5" style="width:85%">
     <span id="volumeLabel"></span>
-    </div>
     <br>
     <label for="frequencySlider">Frequency:</label>
     <input type="range" id="frequencySlider" min="100" max="18000" step="1" value="1000" style="width:85%">
@@ -66,14 +64,14 @@
     let whiteNoise;
     let gainNode;
     let pannerNode;
-    let volume;
+    let volume=0.5;
     let bandpassFilter;
     let isPlaying = false;
     let side =false;
 
     // Create white noise buffer
     function createWhiteNoiseBuffer() {
-      let bufferSize = 2 * audioCtx.sampleRate;
+      let bufferSize = 4 * audioCtx.sampleRate;
       let noiseBuffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
       let output = noiseBuffer.getChannelData(0);
 
@@ -109,6 +107,7 @@
       // Update labels
       document.getElementById('frequencyLabel').textContent = bandpassFilter.frequency.value + ' Hz';
       document.getElementById('bandwidthLabel').textContent = bandwidthValue + ' Hz';
+     document.getElementById('volumeLabel').textContent = (volume*190).toFixed(1) + ' %';
     }
 
     // Create audio graph
@@ -123,6 +122,7 @@
       pannerNode.setPosition(-1, 0, 0);//If you want it to play on the left channel
       gainNode = audioCtx.createGain();
       whiteNoise.connect(bandpassFilter).connect(pannerNode).connect(gainNode).connect(audioCtx.destination);
+    updateFilterParams();
     }
 createAudioGraph()
     // Event listeners
@@ -153,7 +153,8 @@ createAudioGraph()
        
     });
     document.getElementById('volumeSlider').addEventListener('input', function() {
-      volume=parseFloat(this.value);
+      volume=Math.exp(parseFloat(this.value*10))/50000;
+      console.log(volume);
       updateFilterParams();
     });
 
@@ -164,6 +165,7 @@ createAudioGraph()
     document.getElementById('bandwidthSlider').addEventListener('input', function() {
       updateFilterParams();
     });
+    
   </script>
 </body>
 </html>
