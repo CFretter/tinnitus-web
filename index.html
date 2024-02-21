@@ -43,11 +43,11 @@
   </div>
   <br>
   <label for="volumeSlider">Volume:</label>
-  <input type="range" id="volumeSlider" min="0" max="1" step="0.01" value="0.5" style="width:85%">
+  <input type="range" id="volumeSlider" min="0" max="2" step="0.01" value="1.5" style="width:85%">
   <span id="volumeLabel"></span>
   <br>
   <label for="frequencySlider">Frequency:</label>
-  <input type="range" id="frequencySlider" min="1" max="3" step="0.01" value="1" style="width:85%">
+  <input type="range" id="frequencySlider" min="1" max="3" step="0.01" value="2" style="width:85%">
   <span id="frequencyLabel">200 Hz</span>
   <br>
   <label for="bandwidthSlider">Bandwidth:</label>
@@ -60,7 +60,7 @@
     let whiteNoise;
     let gainNode;
     let pannerNode;
-    let volume=0.5;
+    let volume=31.6;
     let bandpassFilter;
     let isPlaying = false;
     let side =false;
@@ -95,12 +95,12 @@
       let nyquist = audioCtx.sampleRate / 2;
       let q=bandpassFilter.frequency.value *1.0 / bandwidthValue;
       bandpassFilter.Q.value = q;
-      gainNode.gain.value = volume*q;
+      gainNode.gain.value = volume*q/2000;
       
       // Update labels
-      document.getElementById('frequencyLabel').textContent = frequencyValue.toFixed(1) + ' Hz';
+      document.getElementById('frequencyLabel').textContent = frequencyValue.toFixed(0) + ' Hz';
       document.getElementById('bandwidthLabel').textContent = bandwidthValue + ' Hz';
-      document.getElementById('volumeLabel').textContent = (volume*190).toFixed(1) + ' %';
+      document.getElementById('volumeLabel').textContent = (volume).toFixed(1) + ' %';
     }
 
     function createAudioGraph() {
@@ -140,9 +140,9 @@
     side=false;
       pannerNode.setPosition(1, 0, 0);//If you want it to play on the left channel   
     });
-    
+
     document.getElementById('volumeSlider').addEventListener('input', function() {
-      volume=Math.exp(parseFloat(this.value*10))/50000;
+      volume=Math.pow(10,parseFloat(this.value));
       console.log(volume);
       updateFilterParams();
     });
