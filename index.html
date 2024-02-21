@@ -42,21 +42,20 @@
     <label for="r">right</label>
   </div>
   <br>
-      <label for="volumeSlider">Volume:</label>
-    <input type="range" id="volumeSlider" min="0" max="1" step="0.01" value="0.5" style="width:85%">
-    <span id="volumeLabel"></span>
-    <br>
-    <label for="frequencySlider">Frequency:</label>
-    <input type="range" id="frequencySlider" min="1" max="3" step="0.01" value="1" style="width:85%">
-    <span id="frequencyLabel">200 Hz</span>
-    <br>
-    <label for="bandwidthSlider">Bandwidth:</label>
-    <input type="range" id="bandwidthSlider" min="1" max="500" step="1" value="100" style="width:85%">
-    <span id="bandwidthLabel">100 Hz</span>
+  <label for="volumeSlider">Volume:</label>
+  <input type="range" id="volumeSlider" min="0" max="1" step="0.01" value="0.5" style="width:85%">
+  <span id="volumeLabel"></span>
+  <br>
+  <label for="frequencySlider">Frequency:</label>
+  <input type="range" id="frequencySlider" min="1" max="3" step="0.01" value="1" style="width:85%">
+  <span id="frequencyLabel">200 Hz</span>
+  <br>
+  <label for="bandwidthSlider">Bandwidth:</label>
+  <input type="range" id="bandwidthSlider" min="1" max="500" step="1" value="100" style="width:85%">
+  <span id="bandwidthLabel">100 Hz</span>
   </div>
 
   <script>
-    // Initialize variables
     let audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     let whiteNoise;
     let gainNode;
@@ -66,7 +65,6 @@
     let isPlaying = false;
     let side =false;
 
-    // Create white noise buffer
     function createWhiteNoiseBuffer() {
       let bufferSize = 4 * audioCtx.sampleRate;
       let noiseBuffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
@@ -75,11 +73,9 @@
       for (let i = 0; i < bufferSize; i++) {
         output[i] = Math.random() * 2 - 1;
       }
-
       return noiseBuffer;
     }
 
-    // Create bandpass filter
     function createBandpassFilter() {
       let filter = audioCtx.createBiquadFilter();
       filter.type = 'bandpass';
@@ -90,28 +86,23 @@
       return filter;
     }
 
-    // Update bandpass filter parameters
+    
     function updateFilterParams() {
       let fsliderpos=parseFloat(document.getElementById('frequencySlider').value);
-      
       let frequencyValue= Math.pow(10,fsliderpos)*20;
-      console.log("updateFilterParams()",frequencyValue);
-     
       bandpassFilter.frequency.value = frequencyValue;
       let bandwidthValue = parseFloat(document.getElementById('bandwidthSlider').value);
       let nyquist = audioCtx.sampleRate / 2;
       let q=bandpassFilter.frequency.value *1.0 / bandwidthValue;
       bandpassFilter.Q.value = q;
-      // console.log(bandwidthalue,q,volume)
-     gainNode.gain.value = volume*q;
+      gainNode.gain.value = volume*q;
       
       // Update labels
       document.getElementById('frequencyLabel').textContent = frequencyValue.toFixed(1) + ' Hz';
       document.getElementById('bandwidthLabel').textContent = bandwidthValue + ' Hz';
-     document.getElementById('volumeLabel').textContent = (volume*190).toFixed(1) + ' %';
+      document.getElementById('volumeLabel').textContent = (volume*190).toFixed(1) + ' %';
     }
 
-    // Create audio graph
     function createAudioGraph() {
       whiteNoise = audioCtx.createBufferSource();
       whiteNoise.loop=true
@@ -123,9 +114,10 @@
       pannerNode.setPosition(-1, 0, 0);//If you want it to play on the left channel
       gainNode = audioCtx.createGain();
       whiteNoise.connect(bandpassFilter).connect(pannerNode).connect(gainNode).connect(audioCtx.destination);
-    updateFilterParams();
+      updateFilterParams();
     }
-createAudioGraph()
+    //initialise stuff
+    createAudioGraph()
     // Event listeners
     document.getElementById('playButton').addEventListener('click', function() {
       if (!isPlaying) {
@@ -141,18 +133,14 @@ createAudioGraph()
     });
 
     document.getElementById('left').addEventListener('input', function() {
-     
-      side=true;
-      pannerNode.setPosition(-1, 0, 0);//If you want it to play on the left channel
-   
+     side=true;
+    pannerNode.setPosition(-1, 0, 0);//If you want it to play on the left channel
     });
      document.getElementById('right').addEventListener('input', function() {
-    
-      side=false;
-      pannerNode.setPosition(1, 0, 0);//If you want it to play on the left channel
-   
-       
+    side=false;
+      pannerNode.setPosition(1, 0, 0);//If you want it to play on the left channel   
     });
+    
     document.getElementById('volumeSlider').addEventListener('input', function() {
       volume=Math.exp(parseFloat(this.value*10))/50000;
       console.log(volume);
