@@ -43,16 +43,20 @@
   </div>
   <br>
   <label for="volumeSlider">Volume [quiet to loud]:</label>
+  <span id="volumeLabel"></span><br>
   <input type="range" id="volumeSlider" min="0" max="2" step="0.01" value="1.5" style="width:85%">
-  <span id="volumeLabel"></span>
+  
   <br>
-  <label for="frequencySlider">Frequency [low to high]:</label>
+  <label for="frequencySlider">Frequency [low to high]:</label> <span id="frequencyLabel">200 Hz</span><br>
   <input type="range" id="frequencySlider" min="1" max="3" step="0.01" value="2" style="width:85%">
-  <span id="frequencyLabel">200 Hz</span>
+  
+ 
   <br>
   <label for="bandwidthSlider">Bandwidth [beep to hiss]:</label>
-  <input type="range" id="bandwidthSlider" min="0.5" max="200" step="0.1" value="20" style="width:85%">
   <span id="bandwidthLabel">100 Hz</span>
+  <br>
+  <input type="range" id="bandwidthSlider" min="0.5" max="200" step="0.1" value="20" style="width:85%">
+  
   </div>
 
   <script>
