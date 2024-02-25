@@ -52,10 +52,10 @@
   
  
   <br>
-  <label for="bandwidthSlider">Bandwidth [beep to hiss]:</label>
+  <label for="bandwidthSlider">Bandwidth [hiss to beep]:</label>
   <span id="bandwidthLabel">100 Hz</span>
   <br>
-  <input type="range" id="bandwidthSlider" min="0.5" max="200" step="0.1" value="20" style="width:85%">
+  <input type="range" id="bandwidthSlider" min="1" max="4" step="0.01" value="2" style="width:85%">
   
   </div>
 
@@ -73,7 +73,6 @@
       let bufferSize = 4 * audioCtx.sampleRate;
       let noiseBuffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
       let output = noiseBuffer.getChannelData(0);
-
       for (let i = 0; i < bufferSize; i++) {
         output[i] = Math.random() * 2 - 1;
       }
@@ -83,27 +82,24 @@
     function createBandpassFilter() {
       let filter = audioCtx.createBiquadFilter();
       filter.type = 'bandpass';
-      filter.frequency.value = parseFloat(document.getElementById('bandwidthSlider').value); // default frequency
-      let bandwidthValue = parseFloat(document.getElementById('bandwidthSlider').value);
-      filter.Q.value = 10//filter.frequency.value / bandwidthValue; // default Q factor
+      filter.frequency.value = Math.pow(10,parseFloat(document.getElementById('frequencySlider').value))*20;
+      let q = Math.pow(10,parseFloat(document.getElementById('bandwidthSlider').value));
+      filter.Q.value = q;
       filter.gain.value=1
       return filter;
     }
 
     
     function updateFilterParams() {
-      let fsliderpos=parseFloat(document.getElementById('frequencySlider').value);
-      let frequencyValue= Math.pow(10,fsliderpos)*20;
-      bandpassFilter.frequency.value = frequencyValue;
-      let bandwidthValue = parseFloat(document.getElementById('bandwidthSlider').value);
+      bandpassFilter.frequency.value = Math.pow(10,parseFloat(document.getElementById('frequencySlider').value))*20;
+      let q = Math.pow(10,parseFloat(document.getElementById('bandwidthSlider').value));
       let nyquist = audioCtx.sampleRate / 2;
-      let q=bandpassFilter.frequency.value *1.0 / bandwidthValue;
+      let bandwidthValue=bandpassFilter.frequency.value *1.0 /q;
       bandpassFilter.Q.value = q;
       gainNode.gain.value = volume*q/2000;
-      
       // Update labels
-      document.getElementById('frequencyLabel').textContent = frequencyValue.toFixed(0) + ' Hz';
-      document.getElementById('bandwidthLabel').textContent = bandwidthValue + ' Hz';
+      document.getElementById('frequencyLabel').textContent = bandpassFilter.frequency.value.toFixed(0) + ' Hz';
+      document.getElementById('bandwidthLabel').textContent = bandwidthValue.toFixed(1) + ' Hz, Q: ' + q.toFixed(2) ;
       document.getElementById('volumeLabel').textContent = (volume).toFixed(1) + ' %';
     }
 
@@ -111,9 +107,7 @@
       whiteNoise = audioCtx.createBufferSource();
       whiteNoise.loop=true
       whiteNoise.buffer = createWhiteNoiseBuffer();
-
       bandpassFilter = createBandpassFilter();
-
       pannerNode = audioCtx.createPanner();
       pannerNode.setPosition(-1, 0, 0);//If you want it to play on the left channel
       gainNode = audioCtx.createGain();
@@ -147,7 +141,6 @@
 
     document.getElementById('volumeSlider').addEventListener('input', function() {
       volume=Math.pow(10,parseFloat(this.value));
-      console.log(volume);
       updateFilterParams();
     });
 
