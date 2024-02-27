@@ -60,7 +60,7 @@
   </div>
 
   <script>
-    let audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    let audioCtx;
     let whiteNoise;
     let gainNode;
     let pannerNode;
@@ -104,6 +104,8 @@
     }
 
     function createAudioGraph() {
+      audioCtx= new (window.AudioContext || window.webkitAudioContext)();
+  
       whiteNoise = audioCtx.createBufferSource();
       whiteNoise.loop=true
       whiteNoise.buffer = createWhiteNoiseBuffer();
@@ -113,7 +115,7 @@
       gainNode = audioCtx.createGain();
       whiteNoise.connect(bandpassFilter).connect(pannerNode).connect(gainNode).connect(audioCtx.destination);
       updateFilterParams();
-      audioCtx.resume(); 
+      
     }
     //initialise stuff
     //createAudioGraph()
@@ -121,6 +123,7 @@
     document.getElementById('playButton').addEventListener('click', function() {
       if (!isPlaying) {
         createAudioGraph();
+        audioCtx.resume(); 
         whiteNoise.start();
         isPlaying = true;
         document.getElementById('playButton').textContent = 'Stop';
