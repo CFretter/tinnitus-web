@@ -113,9 +113,10 @@
       gainNode = audioCtx.createGain();
       whiteNoise.connect(bandpassFilter).connect(pannerNode).connect(gainNode).connect(audioCtx.destination);
       updateFilterParams();
+      audioCtx.resume(); 
     }
     //initialise stuff
-    createAudioGraph()
+    //createAudioGraph()
     // Event listeners
     document.getElementById('playButton').addEventListener('click', function() {
       if (!isPlaying) {
