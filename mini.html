@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+  <button id="playButton">Play</button>
+  <script>
+      let audioCtx;
+      let whiteNoise;
+      let isPlaying = false;
+      
+      function createWhiteNoiseBuffer() {
+        let bufferSize = 4 * audioCtx.sampleRate;
+        let noiseBuffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+        let output = noiseBuffer.getChannelData(0);
+        for (let i = 0; i < bufferSize; i++) {
+          output[i] = Math.random() * 2 - 1;
+        }
+        return noiseBuffer;
+      }
+   
+      function createAudioGraph() {
+        audioCtx= new (window.AudioContext || window.webkitAudioContext)();
+        whiteNoise = audioCtx.createBufferSource();
+        whiteNoise.loop=true
+        whiteNoise.buffer = createWhiteNoiseBuffer();
+        whiteNoise.connect(audioCtx.destination);
+        
+      }
+      
+      document.getElementById('playButton').addEventListener('click', function() {
+        if (!isPlaying) {
+          createAudioGraph();
+          audioCtx.resume(); 
+          whiteNoise.start();
+          isPlaying = true;
+          document.getElementById('playButton').textContent = 'Stop';
+        } else {
+          whiteNoise.stop();
+          isPlaying = false;
+          document.getElementById('playButton').textContent = 'Play';
+        }
+      });    
+  </script>
+</body>
+</html>
